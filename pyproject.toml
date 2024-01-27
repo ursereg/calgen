@@ -1,0 +1,37 @@
+[project]
+name = "calgen"
+version = "1.0.0"
+dependencies = [
+    "click",
+]
+license = {file = "LICENSE.md"}
+authors = [
+  {name = "Mateusz Maciaś", email = "mmacias@sinevo.pl"},
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+    "isort",
+    "mypy",
+    "pre-commit",
+    "build",
+    "wheel",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+calgencli = "calgen.cli.calgen:main"
