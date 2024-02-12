@@ -2,7 +2,9 @@
 name = "calgen"
 version = "1.0.0"
 dependencies = [
-    "click",
+  "pydantic",
+  "click",
+  "drawsvg[all]",
 ]
 license = {file = "LICENSE.md"}
 authors = [
@@ -15,14 +17,14 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "black",
-    "flake8",
-    "isort",
-    "mypy",
-    "pre-commit",
-    "build",
-    "wheel",
+  "pytest",
+  "black",
+  "flake8",
+  "isort",
+  "mypy",
+  "pre-commit",
+  "build",
+  "wheel",
 ]
 
 [build-system]
@@ -35,3 +37,9 @@ where = ["src"]
 
 [project.scripts]
 calgencli = "calgen.cli.calgen:main"
+
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
