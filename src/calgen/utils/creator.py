@@ -1,18 +1,27 @@
-"""Create actual calendar based on what was generated."""
+"""Create actual calendar drawing based on what was generated."""
 
 import drawsvg as draw
 
-from calgen.config.calendar import CellStyle, ConfigurationBase
+from calgen.config.calendar import CalendarConfig, CellStyle
 from calgen.utils import generator
+
+
+def render(configuration: CalendarConfig) -> draw.Drawing:
+    table = generator.generate(configuration)
+    columns = max(len(row.fields) for row in table.rows)
+    width = columns * configuration.base_row_width
+    height = len(table.rows) * configuration.base_row_height
+    drawing = draw.Drawing(width, height)
+    drawing.append(draw_table(table, configuration))
+    return drawing
 
 
 def draw_table(
     table: generator.CalTable,
-    configuration: ConfigurationBase,
+    configuration: CalendarConfig,
 ) -> draw.DrawingParentElement:
     group = draw.Group()
     for index, item in enumerate(table.rows):
-        # print(index, item)
         offset = index * configuration.base_row_height
         sub_group = draw.Group(transform=f"translate(0,{offset})")
         sub_group.append(draw_row(item, configuration))
@@ -21,11 +30,10 @@ def draw_table(
 
 
 def draw_row(
-    row: generator.CalRow, configuration: ConfigurationBase
+    row: generator.CalRow, configuration: CalendarConfig
 ) -> draw.DrawingParentElement:
     group = draw.Group()
     for index, item in enumerate(row.fields):
-        # print(index, item)
         offset = index * configuration.base_row_width
         sub_group = draw.Group(transform=f"translate({offset})")
         sub_group.append(draw_field(item, configuration))
@@ -34,31 +42,27 @@ def draw_row(
 
 
 def draw_field(
-    field: generator.CalField, configuration: ConfigurationBase
+    field: generator.CalField, configuration: CalendarConfig
 ) -> draw.DrawingParentElement:
     group = draw.Group()
     style = CellStyle()
-    # print(field.date)
+    data = None
     if field.type == generator.CalFieldType.date and field.date is not None:
         if not field.this_month:
             style = configuration.style_not_this_month
+        elif field.weekday == 6:
+            style = configuration.style_sunday
+        elif field.weekday == 5:
+            style = configuration.style_saturday
         else:
-            if field.weekday == 6:
-                # From zero, this is sunday
-                style = configuration.style_sunday
-            elif field.weekday == 5:
-                # From zero, this is saturday
-                style = configuration.style_saturday
-            else:
-                style = configuration.style_workday
+            style = configuration.style_workday
         data = str(field.date.day)
     elif field.type == generator.CalFieldType.label and field.label is not None:
         data = field.label
         style = configuration.style_headers
     else:
-        data = None
         style = configuration.style_nothing
-    print(style)
+
     box = draw.Rectangle(
         style.stroke_width,
         style.stroke_width,
@@ -69,6 +73,7 @@ def draw_field(
         fill=style.fill_color,
         fill_opacity=style.fill_opacity,
     )
+    group.append(box)
     if data is not None:
         text = draw.Text(
             data,
@@ -76,11 +81,8 @@ def draw_field(
             configuration.base_row_width / 2,
             configuration.base_row_height / 2,
             center=True,
-            text_color=style.text_color,
+            fill=style.text_color,
+            font_weight=style.font_weight,
         )
         group.append(text)
-    # if field.type == generator.CalFieldType.date:
-    # box.append_title("test")
-    group.append(box)
-
     return group

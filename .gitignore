@@ -161,3 +161,11 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# calgen generated output (repo root)
+/*.svg
+/*.pdf
+/*.png
+
+# generated sample calendars
+/samples/

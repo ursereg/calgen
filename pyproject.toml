@@ -5,6 +5,7 @@ dependencies = [
   "pydantic",
   "click",
   "drawsvg[all]",
+  "pyyaml",
 ]
 license = {file = "LICENSE.md"}
 authors = [
@@ -36,10 +37,18 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [project.scripts]
-calgencli = "calgen.cli.calgen:main"
+calgen = "calgen.cli.calgen:main"
 
 
 [tool.mypy]
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["drawsvg.*", "cairosvg", "yaml"]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
