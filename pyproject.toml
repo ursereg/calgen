@@ -1,11 +1,13 @@
 [project]
 name = "calgen"
 version = "1.0.0"
+requires-python = ">=3.10"
 dependencies = [
   "pydantic",
   "click",
   "drawsvg[all]",
   "pyyaml",
+  "holidays",
 ]
 license = {file = "LICENSE.md"}
 authors = [
@@ -19,6 +21,7 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
   "pytest",
+  "pypdf",
   "black",
   "flake8",
   "isort",

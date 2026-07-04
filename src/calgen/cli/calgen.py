@@ -7,11 +7,14 @@ import drawsvg as draw
 
 from calgen.config.calendar import CalendarConfig
 from calgen.config.loader import load_config
-from calgen.utils.creator import render
+from calgen.utils.creator import paginate_svg, render
 
 
 def save_calendar(
-    drawing: draw.Drawing, base_path: str, formats: Tuple[str, ...]
+    drawing: draw.Drawing,
+    base_path: str,
+    formats: Tuple[str, ...],
+    configuration: CalendarConfig,
 ) -> None:
     for fmt in formats:
         target = f"{base_path}.{fmt}"
@@ -26,7 +29,16 @@ def save_calendar(
                     "(`pip install 'drawsvg[all]'`) and the system cairo library. "
                     f"Original error: {error}"
                 )
-            cairosvg.svg2pdf(bytestring=drawing.as_svg().encode(), write_to=target)
+            if configuration.paper:
+                svg = paginate_svg(
+                    drawing,
+                    configuration.paper,
+                    configuration.margin_mm,
+                    configuration.landscape,
+                )
+            else:
+                svg = drawing.as_svg()
+            cairosvg.svg2pdf(bytestring=svg.encode(), write_to=target)
 
 
 @click.command()
@@ -51,6 +63,29 @@ def save_calendar(
     help="Note-row label under each month; repeat for multiple rows.",
 )
 @click.option(
+    "--holidays-country",
+    default=None,
+    help="Mark public holidays for a country code, e.g. PL for Poland.",
+)
+@click.option(
+    "--paper",
+    default=None,
+    help="PDF paper size (A5, A4, A3, A2, letter, legal). Omit to fit content.",
+)
+@click.option(
+    "--margin",
+    "margin_mm",
+    type=float,
+    default=None,
+    help="PDF page margin in millimetres (default 10).",
+)
+@click.option(
+    "--landscape/--portrait",
+    "landscape",
+    default=None,
+    help="PDF orientation (default landscape).",
+)
+@click.option(
     "--output",
     type=click.Path(dir_okay=False),
     default="calendar",
@@ -69,6 +104,10 @@ def main(
     year: Optional[int],
     first_weekday: Optional[int],
     notes: Tuple[str, ...],
+    holidays_country: Optional[str],
+    paper: Optional[str],
+    margin_mm: Optional[float],
+    landscape: Optional[bool],
     output: str,
     formats: Tuple[str, ...],
 ) -> None:
@@ -85,9 +124,17 @@ def main(
         overrides["first_week_day"] = first_weekday
     if notes:
         overrides["month_notes"] = list(notes)
+    if holidays_country is not None:
+        overrides["holidays_country"] = holidays_country
+    if paper is not None:
+        overrides["paper"] = paper
+    if margin_mm is not None:
+        overrides["margin_mm"] = margin_mm
+    if landscape is not None:
+        overrides["landscape"] = landscape
     if overrides:
         config = config.model_copy(update=overrides)
 
     drawing = render(config)
-    save_calendar(drawing, output, formats)
+    save_calendar(drawing, output, formats, config)
     click.echo(f"Wrote {', '.join(f'{output}.{f}' for f in formats)}")

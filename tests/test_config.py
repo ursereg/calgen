@@ -7,18 +7,32 @@ def test_default_config() -> None:
     assert config.year == 2026
 
 
-def test_bw_theme_defaults() -> None:
+def _gray(color: str) -> int:
+    # All theme fills are #rrggbb grayscale; return the shared channel value.
+    assert color.startswith("#") and len(color) == 7
+    return int(color[1:3], 16)
+
+
+def test_bw_theme_is_a_dark_ramp() -> None:
     from calgen.config.calendar import CalendarConfig
 
     config = CalendarConfig()
 
-    assert config.style_workday.fill_color == "none"
+    # Every column type has a fill (no bare-white working days), and the ramp
+    # gets darker with the "day off" level: working < Saturday < Sunday < holiday.
+    working = _gray(config.style_workday.fill_color)
+    saturday = _gray(config.style_saturday.fill_color)
+    sunday = _gray(config.style_sunday.fill_color)
+    holiday = _gray(config.style_holiday.fill_color)
+    assert working > saturday > sunday > holiday
+
     assert config.style_workday.fill_opacity == 1.0
-    assert config.style_saturday.fill_color == "#eee"
-    assert config.style_sunday.fill_color == "#ddd"
     assert config.style_sunday.font_weight == "bold"
+    assert config.style_holiday.font_weight == "bold"
     assert config.style_headers.font_weight == "bold"
-    assert config.style_not_this_month.text_color == "#bbb"
+    assert config.style_not_this_month.text_color != "black"
+    assert config.shade_other_months is True
+    assert config.hatch_other_months is True
 
 
 def test_configuration_base_is_gone() -> None:

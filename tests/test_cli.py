@@ -13,6 +13,24 @@ def test_cli_writes_svg(tmp_path) -> None:
     assert (tmp_path / "cal.svg").exists()
 
 
+def test_cli_marks_holidays(tmp_path) -> None:
+    from calgen.cli.calgen import main
+    from calgen.config.calendar import CalendarConfig
+
+    out = tmp_path / "cal"
+    result = CliRunner().invoke(
+        main,
+        ["--year", "2026", "--holidays-country", "PL", "--output", str(out)],
+    )
+
+    assert result.exit_code == 0, result.output
+    # The holiday fill only appears when a holiday is actually marked.
+    assert (
+        f'fill="{CalendarConfig().style_holiday.fill_color}"'
+        in (tmp_path / "cal.svg").read_text()
+    )
+
+
 def test_cli_writes_svg_and_pdf(tmp_path) -> None:
     from calgen.cli.calgen import main
 
@@ -70,9 +88,7 @@ def test_cli_reports_bad_config(tmp_path) -> None:
     cfg.write_text("year: not-a-number\n")
     out = tmp_path / "cal"
 
-    result = CliRunner().invoke(
-        main, ["--config", str(cfg), "--output", str(out)]
-    )
+    result = CliRunner().invoke(main, ["--config", str(cfg), "--output", str(out)])
 
     assert result.exit_code != 0
     # Readable click error, not a raw traceback.
