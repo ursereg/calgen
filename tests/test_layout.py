@@ -42,6 +42,26 @@ def test_paginate_svg_rejects_unknown_paper() -> None:
         paginate_svg(render(CalendarConfig(year=2026)), "B7", 10.0, landscape=True)
 
 
+def test_paginate_svg_sets_a0_portrait_page() -> None:
+    from calgen.config.calendar import CalendarConfig
+    from calgen.utils.creator import paginate_svg, render
+
+    svg = paginate_svg(render(CalendarConfig(year=2026)), "A0", 15.0, landscape=False)
+
+    assert 'width="841mm"' in svg
+    assert 'height="1189mm"' in svg
+
+
+def test_paginate_svg_sets_a1_portrait_page() -> None:
+    from calgen.config.calendar import CalendarConfig
+    from calgen.utils.creator import paginate_svg, render
+
+    svg = paginate_svg(render(CalendarConfig(year=2026)), "A1", 15.0, landscape=False)
+
+    assert 'width="594mm"' in svg
+    assert 'height="841mm"' in svg
+
+
 def test_cli_paper_produces_a3_pdf(tmp_path) -> None:
     from click.testing import CliRunner
 

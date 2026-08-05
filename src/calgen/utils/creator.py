@@ -45,10 +45,12 @@ def render(configuration: CalendarConfig) -> draw.Drawing:
 
 # Portrait paper sizes in millimetres.
 PAPER_SIZES_MM = {
-    "A5": (148, 210),
-    "A4": (210, 297),
-    "A3": (297, 420),
+    "A0": (841, 1189),
+    "A1": (594, 841),
     "A2": (420, 594),
+    "A3": (297, 420),
+    "A4": (210, 297),
+    "A5": (148, 210),
     "letter": (216, 279),
     "legal": (216, 356),
 }
