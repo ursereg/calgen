@@ -43,8 +43,6 @@ def test_weekdays_length_matches_existing_years() -> None:
 
 
 def test_generate_spans_a_year_boundary() -> None:
-    import datetime
-
     from calgen.config.calendar import CalendarConfig
     from calgen.utils.generator import generate
 
@@ -62,9 +60,7 @@ def test_generate_spans_a_year_boundary() -> None:
     # the first this-month date cell's (year, month) in each row.
     expected = [(2026, 11), (2026, 12), (2027, 1), (2027, 2)]
     for row, (year, month) in zip(date_rows, expected):
-        this_month_dates = [
-            field.date for field in row.fields[1:] if field.this_month
-        ]
+        this_month_dates = [field.date for field in row.fields[1:] if field.this_month]
         assert this_month_dates, f"row for {year}-{month} has no this-month dates"
         assert all(d.year == year and d.month == month for d in this_month_dates)
 
@@ -142,9 +138,7 @@ def test_holiday_dates_cover_the_full_span_plus_spillover() -> None:
 
     # Aug 2026 - Jul 2027: Polish holidays in both years must be present,
     # including a holiday that only exists in the trailing year (2027).
-    config = CalendarConfig(
-        year=2026, start_month=8, months=12, holidays_country="PL"
-    )
+    config = CalendarConfig(year=2026, start_month=8, months=12, holidays_country="PL")
     dates = holiday_dates(config)
     assert datetime.date(2026, 12, 25) in dates  # Christmas Day 2026
     assert datetime.date(2027, 5, 1) in dates  # Labour Day 2027
