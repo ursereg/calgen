@@ -80,9 +80,35 @@ centred (printers cannot print to the very edge, so a margin is required):
 calgen --holidays-country PL --paper A3 --margin 10 --format pdf
 ```
 
-`--paper` accepts A5, A4, A3, A2, letter, legal. `--margin` is in millimetres
+`--paper` accepts A0, A1, A5, A4, A3, A2, letter, legal. `--margin` is in millimetres
 (default 10). Orientation defaults to landscape; use `--portrait` to flip it.
 The linear layout is very wide, so A3 landscape is the most legible.
+
+### Multi-year spans and note rows
+
+By default the calendar covers January-December of `--year`. To start
+somewhere else (e.g. a school year), set `start_month` and `months` in the
+config file:
+
+```yaml
+year: 2026
+start_month: 8   # August
+months: 12       # runs through July 2027
+```
+
+Month and corner labels automatically include the year (`Aug 26`, `2026/27`)
+whenever the span isn't a plain calendar year, so adjacent years aren't
+ambiguous.
+
+Note rows (blank rows under each month for annotations) are set via
+`month_notes` in the config file, or `--note-rows N` on the command line for
+N unlabelled rows (shorthand for N repeats of `--note ""`; cannot be combined
+with `--note`).
+
+`--paper` now also accepts `A0` and `A1` for wall-sized prints. A tall,
+many-row calendar like a 12-month/8-rows-per-month span reads best as
+`--portrait` at A0 or A1, since the linear layout becomes taller than it is
+wide.
 
 ### Config file
 
