@@ -63,6 +63,13 @@ def save_calendar(
     help="Note-row label under each month; repeat for multiple rows.",
 )
 @click.option(
+    "--note-rows",
+    type=int,
+    default=None,
+    help="Number of blank note rows per month (shorthand for repeating --note "
+    "with empty labels). Cannot be combined with --note.",
+)
+@click.option(
     "--holidays-country",
     default=None,
     help="Mark public holidays for a country code, e.g. PL for Poland.",
@@ -104,6 +111,7 @@ def main(
     year: Optional[int],
     first_weekday: Optional[int],
     notes: Tuple[str, ...],
+    note_rows: Optional[int],
     holidays_country: Optional[str],
     paper: Optional[str],
     margin_mm: Optional[float],
@@ -122,8 +130,12 @@ def main(
         overrides["year"] = year
     if first_weekday is not None:
         overrides["first_week_day"] = first_weekday
+    if notes and note_rows is not None:
+        raise click.ClickException("Pass either --note and --note-rows, not both.")
     if notes:
         overrides["month_notes"] = list(notes)
+    elif note_rows is not None:
+        overrides["month_notes"] = [""] * note_rows
     if holidays_country is not None:
         overrides["holidays_country"] = holidays_country
     if paper is not None:
