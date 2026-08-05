@@ -62,6 +62,7 @@ def test_span_can_start_mid_year() -> None:
 
 def test_start_month_out_of_range_is_rejected() -> None:
     import pydantic
+
     from calgen.config.calendar import CalendarConfig
 
     with pytest.raises(pydantic.ValidationError):
@@ -72,6 +73,7 @@ def test_start_month_out_of_range_is_rejected() -> None:
 
 def test_months_must_be_positive() -> None:
     import pydantic
+
     from calgen.config.calendar import CalendarConfig
 
     with pytest.raises(pydantic.ValidationError):

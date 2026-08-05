@@ -77,7 +77,7 @@ def save_calendar(
 @click.option(
     "--paper",
     default=None,
-    help="PDF paper size (A5, A4, A3, A2, letter, legal). Omit to fit content.",
+    help="PDF paper size (A0, A1, A5, A4, A3, A2, letter, legal). Omit to fit content.",
 )
 @click.option(
     "--margin",
