@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_default_config() -> None:
     from calgen.config.calendar import CalendarConfig
 
@@ -39,3 +42,37 @@ def test_configuration_base_is_gone() -> None:
     import calgen.config.calendar as mod
 
     assert not hasattr(mod, "ConfigurationBase")
+
+
+def test_default_span_is_calendar_year() -> None:
+    from calgen.config.calendar import CalendarConfig
+
+    config = CalendarConfig()
+    assert config.start_month == 1
+    assert config.months == 12
+
+
+def test_span_can_start_mid_year() -> None:
+    from calgen.config.calendar import CalendarConfig
+
+    config = CalendarConfig(start_month=8, months=12)
+    assert config.start_month == 8
+    assert config.months == 12
+
+
+def test_start_month_out_of_range_is_rejected() -> None:
+    import pydantic
+    from calgen.config.calendar import CalendarConfig
+
+    with pytest.raises(pydantic.ValidationError):
+        CalendarConfig(start_month=13)
+    with pytest.raises(pydantic.ValidationError):
+        CalendarConfig(start_month=0)
+
+
+def test_months_must_be_positive() -> None:
+    import pydantic
+    from calgen.config.calendar import CalendarConfig
+
+    with pytest.raises(pydantic.ValidationError):
+        CalendarConfig(months=0)

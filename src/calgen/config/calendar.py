@@ -2,7 +2,7 @@ import calendar
 import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CellStyle(BaseModel):
@@ -17,6 +17,8 @@ class CellStyle(BaseModel):
 
 class CalendarConfig(BaseModel):
     year: int = 2026
+    start_month: int = Field(default=1, ge=1, le=12)
+    months: int = Field(default=12, ge=1)
     first_week_day: int = calendar.MONDAY
     month_notes: List[str] = ["", "", ""]
     base_row_width: float = 100
